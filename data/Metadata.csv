@@ -1,0 +1,85 @@
+Data,Description
+name,Name of the researcher who performed the data extraction. 
+ref,Abbreviated reference for the study. 
+title,Title of the paper or thesis. 
+pub_year,Publication year of the paper or thesis. 
+thesis_chapter,"If the study is a thesis, the chapter the data is taken from (e.g., 2). Note that when more than one chapter was relevant, a different study_ID (see below) was assigned to each chapter. "
+chapter_title,The title of the thesis chapter the data is taken from. 
+peer-reviewed,"Whether the study was peer-reviewed or not (i.e., thesis). Factor with two levels: “peer-reviewed”, “not_peer-reviewed”. "
+doi,DOI of the paper. 
+language,"Language of the paper (main text). Factor with seven levels: “English”, “traditional Chinese”, “simplified Chinese”, “French”, “Japanese”, “Portuguese”, “Spanish”. "
+screening_cat,"Whether the study was found in the main database searches (Scopus, Web of Science, Lens, Proquest, backward searches), or in Google Scholar. Factor with two levels: “database”, “GS”."
+row_n,Row number to order data. 
+es_ID,"Unique identifier for each upper thermal limit estimate (e.g., es1, es2, es3). "
+study_ID,"Unique identifier for each study (e.g., st1, st2, st3). "
+species_ID,"Unique identifier for each species (e.g., sp1, sp2, sp3). "
+population_ID,"Unique identifier for each population (e.g., pop1, pop2, pop3). We refer to distinctions between populations made by the authors (e.g., “northern population”, “central population”, and “southern population”).  "
+cohort_ID,"Unique identifier for each cohort (e.g., co1, co2, co3). By “cohort”, we refer to independent groups of animals. In some cases, upper thermal limits can be measured multiple times on the same cohort of animals (e.g., using different endpoints, or at different ages). As such, the same cohort_ID was assigned to repeated measures (e.g., co4, co4). "
+notes_ID,"General notes related to es_ID, study_ID, species_ID, and population_ID. "
+order,"Species order, according to amphibiaweb.org."
+family,"Species family, according to amphibiaweb.org."
+species,"Species name, according to amphibiaweb.org."
+strain,"The strain, variety, subspecies, or morph of the species, as reported in the study."
+IUCN_status,"International Union for the Conservation of Nature (IUCN) status, according to amphibiaweb.org. "
+notes_species,General notes related to the species taxonomy and IUCN status. 
+origin,"Origin of studied animals. Factor with four levels: recently collected from the wild (i.e., “wild”), eggs laid in the laboratory (i.e., “lab”), animals provided from a supplier (i.e., “supplier”) or “unclear”. For studies collecting eggs from the wild and testing the same generation of animals, animals were considered as “wild”. "
+n_generations_lab,"Number of generations spent in the laboratory, if reported in the study."
+latitude,"Latitude from which animals were collected (decimal degrees). Latitudes presented in degrees/minutes/seconds were converted to decimal degrees. When geographical coordinates were not presented, the coordinates were estimated using Google Maps. "
+longitude,"Longitude from which animals were collected (decimal degrees). Longitudes presented in degrees/minutes/seconds were converted to decimal degrees. When geographical coordinates were not presented, the coordinates were estimated using Google Maps."
+elevation,"Elevation from which animals were collected (meters above sea level), as reported in the study. When not reported, elevation was estimated using latitude and longitude and freemaptools.com."
+date_sampling,"Date at which the animals were sampled (format YEAR/MONTH/DAY, e.g., “2020/07/26”). "
+month_sampling,Month from which the animals were collected. 
+year_sampling,Year from which the animals were collected. 
+start_range_sampling_dates,"The beginning of the range of dates over which animals were collected. Indicated are both the month and the year of collection (e.g., “January_2015”). "
+end_range_sampling_dates,"The end of the range of dates over which animals were collected. Indicated are both the month and the year of collection (e.g., “September_2015”)."
+comment_sampling,Additional comments regarding the sampling of the animals. 
+ambient_temp,"For animals recently sampled from the wild (eggs not laid in the laboratory), the mean ambient temperature (°C) in the month of collection, if reported in the study. If animals were collected over a range of months, the mean temperature across this sampling period was reported."
+substrate_temp,"For animals recently sampled from the wild (eggs not laid in the laboratory), the mean temperature of the substrate (°C) in the month of capture.   If animals were collected over a range of months, the mean temperature across this sampling period was reported."
+water_temp,"For animals recently sampled from the wild (eggs not laid in the laboratory), the mean water temperature (°C) in the month of collection. If animals were collected over a range of months, the mean temperature across this sampling period was reported."
+field_body_temp,"For animals recently sampled from the wild (eggs not laid in the laboratory), the mean body temperature (°C) measured in the field when animals were collected. If animals were collected over a range of months, the mean temperature across this sampling period was reported."
+notes_env_temp,General notes regarding the sampling of animals in the field.
+acclimated,Whether the animals were maintained in the laboratory for >12h or tested shortly after collection. Factor with two levels: “acclimated” or “field-fresh”.  
+incubation_temp,"For animals born in the laboratory, the mean temperature (°C) at which the embryos were incubated. "
+sd_incubation_temp,Variability (standard deviation) in incubation_temp (°C).
+life_stage_acclimated,"For acclimated animals, the life stage acclimated prior to the upper thermal limit assessment. Factor with three levels: “embryos_and_larvae”, “juveniles” or “adults”.  Larval stages of salamanders and tadpoles are referred to as “larvae”. Froglets and toadlets (post-metamorphic frogs or toads that did not reach sexual maturity) are referred to as “juveniles”. "
+gosner_acclimated,"For acclimated animals, the Gosner stage when the acclimation started, if reported in the study. "
+acclimation_temp,"For acclimated animals, the mean temperature of acclimation (°C). Note that “acclimation” refers to a prolonged (>12h) exposure to a new temperature. Therefore, cold/heat shocks or housing conditions just prior to assessing upper thermal limits (e.g., 2 hours at 25°C) are not considered as “acclimation” conditions. If animals were exposed to multiple acclimation conditions (e.g., 15°C for 1 month, and then re-acclimated to 25°C for 7 days), we took the latest acclimation condition as the “acclimation_temp”. "
+sd_acclimation_temp,Variability (standard deviation) in acclimation_temp (°C).
+acclimation_time,The duration of acclimation (days). 
+notes_acclimation,General notes regarding the laboratory acclimation of animals.
+life_stage_tested,"The life stage tested for upper thermal limits.  Factor with three levels: “larvae”, “juveniles” or “adults”. Larval stages of salamanders and tadpoles are referred to as “larvae”. Froglets and toadlets (post-metamorphic frogs or toads that did not reach sexual maturity) are referred to as “juveniles”. "
+gosner_tested,Gosner stage when the animals were assessed for upper thermal limits.
+SVL,"Mean snout-vent length of the animals (mm) when assessed for upper thermal limits, if reported in the study. Note that SVL data was often taken from Rohr et al. (2018)."
+body_mass,Mean body mass of the animals (g) when assessed for upper thermal limits.
+age_tested,The age (days-post-hatching) at which the animals were tested for upper thermal limits. 
+sex,"The sex of the animals. Factor with four levels: “male”, “female”, “mixed”, “unknown”. The “mixed” category was used when authors clearly stipulate that they mixed males and females."
+metric,"The metric used to assess thermal tolerance (CTmax, LT50 or heat-knockdown time). Factor with two levels: “CTmax”, “LT50”. "
+endpoint,"The endpoint that was used for assessing upper thermal limits (loss of righting response, loss of equilibrium, onset of spasms, death, other). Factor with five levels: “LRR”, “LOE”, “OS”, “death”, “other”. If “other”, details are reported in “notes_test” (see below).  "
+medium_test_temp,"Whether the temperature measured during the test was the ambient, the water, or the body temperature. Factor with three levels: “ambient”, “water”, “body”."
+start_temp,"If the metric was CTmax, the starting temperature used in the upper thermal limit assay (°C)."
+ramping,"If the metric was CTmax, the ramping (heating) rate applied to the animals (°C/min). "
+set_time,"If the metric was LT50, the time the animals spent at the test temperature (the time after which the animals the survival was assessed, in hours). If the authors report e.g., 96h-LT50, then set_time would be 96. "
+n_test_temp,"If the metric was LT50, the number of temperatures tested to assess upper thermal limits. E.g., if authors measured survival at 36, 38, 39, and 41°C, n_test_temp = 4. "
+n_replicates_per_temp,"If the metric was LT50, the number of replicates used at each test temperatures. E.g., if authors used 5 test temperatures and measured the survival of three independent cohorts of animals at each test temperature, then n_replicates_per_temp = 3. "
+n_animals_per_replicate,"If the metric was LT50, the number of animals in each replicate. "
+n_test,General notes regarding the CTmax or LT50 assays.
+humidity,"Humidity at which animals were acclimated or tested (% relative humidity). If the humidity during the acclimation and the test were different, priority was given to the conditions of the test."
+oxygen,"Oxygen at which animals were acclimated or tested (mg.L-1 dissolved oxygen). If the oxygen concentration during the acclimation and the test were different, priority was given to the conditions of the test."
+salinity,"Salinity at which animals were acclimated or tested (parts per thousands). If the salinity during the acclimation and the test were different, priority was given to the conditions of the test."
+pH,"pH at which animals were acclimated.  If the pH during the acclimation and the test were different, priority was given to the conditions of the test."
+photoperiod,Photoperiod at which animals were acclimated (number of hours of light per day).
+chemical,"If any, which chemical (e.g., pollutant, toxin) was added to the animals’ environment. If animals were in a control group (i.e., only supplemented with a solvent), “control” was indicated. "
+hormone,"If any, which hormone (e.g., corticosterone, thyroid hormone) was added to the animals’ environment. If animals were in a control group (i.e., only supplemented with a solvent), “control” was indicated. "
+concentration_chemical_hormone,"If any, the concentration of the hormones or chemicals used.  If animals were in a control group, “0” was indicated. "
+unit_chemical_hormone,"The unit used to quantify the chemical or hormonal concentration administered (e.g., g/L, ng/g of sediment)."
+infected,"Whether the animals were infected with a pathogen. Indicate “infected” if the animals were infected with a pathogen. Otherwise, leave the field blank. "
+pathogen,"If the animals were infected with a pathogen, the name of the pathogen (e.g., Batrachochytrium dendrobatidis). "
+notes_supplements,"General notes regarding the addition of chemicals, hormones, or pathogens."
+data_source,"Where the upper thermal limit data is reported (main text, table, figure, published data)."
+data_url,"If the data was published in a repository, the url link to the repository containing the data.  "
+flag,Whether the study has procedural concerns (with details). 
+mean_UTL,Mean upper thermal limit of the animals tested (°C). 
+error_UTL,Standard deviation or standard error of mean_UTL (see error_type)
+n_UTL,"Sample size of mean_UTL. When the metric was LT50, the sample size was taken as the number of test temperatures (“n_test_temp”) * the number of replicates per test temperature (n_replicates_per_temp). "
+error_type,"Whether the error is presented as standard deviations (i.e., “sd”) or standard errors (i.e., “se”)."
+notes_UTL,General notes about upper thermal limit estimates.

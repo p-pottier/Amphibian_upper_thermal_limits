@@ -1,0 +1,378 @@
+---
+title: "Figures_data_descriptor"
+author: "Anonymous for peer-review"
+date: "latest update: `r format(Sys.time(), '%d %B %Y')`"
+output: rmdformats::readthedown
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include = FALSE}
+# knitr setting
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE, 
+  tidy = TRUE,
+  cache = TRUE
+)
+```
+
+# **Load packages and data**
+
+## *Load packages*
+
+```{r}
+pacman::p_load(tidyverse,
+               maps,
+               ape,
+               patchwork,
+               ggtree, # devtools::install_github("YuLab-SMU/ggtree")
+               ggtreeExtra, # devtools::install_github("xiangpin/ggtreeExtra")
+               ggnewscale, # this package is necessary for building trees
+               here,
+               ggspatial,
+               viridis,
+               RColorBrewer) 
+```
+
+
+## *Load data and tree*
+
+```{r}
+d.raw<-read_csv("data/Raw_data.csv") # Import data
+
+tree<-read.tree("data/amph_shl_new_Consensus_7238.tre") # Import tree
+```
+
+# **Match species names to the tree** 
+
+```{r}
+# Rename species to match the tree
+d.raw$species[d.raw$species =="Agalychnis dacnicolor"] <- "Pachymedusa dacnicolor" 
+d.raw$species[d.raw$species =="Anaxyrus caronus"] <- "Anaxyrus canorus"
+d.raw$species[d.raw$species =="Boana albomargina"] <- "Hypsiboas albomarginatus"
+d.raw$species[d.raw$species =="Boana albopunctata"] <- "Hypsiboas albopunctatus"
+d.raw$species[d.raw$species =="Boana almendarizae"] <- "Hypsiboas almendarizae"
+d.raw$species[d.raw$species =="Boana boans"] <- "Hypsiboas boans"
+d.raw$species[d.raw$species =="Boana cinerascens"] <- "Hypsiboas cinerascens"
+d.raw$species[d.raw$species =="Boana crepitans"] <- "Hypsiboas crepitans"
+d.raw$species[d.raw$species =="Boana curupi"] <- "Hypsiboas curupi"
+d.raw$species[d.raw$species =="Boana faber"] <- "Hypsiboas faber"
+d.raw$species[d.raw$species =="Boana fasciata"] <- "Hypsiboas fasciatus"
+d.raw$species[d.raw$species =="Boana geographica"] <- "Hypsiboas geographicus"
+d.raw$species[d.raw$species =="Boana lanciformis"] <- "Hypsiboas lanciformis"
+d.raw$species[d.raw$species =="Boana pardalis"] <- "Hypsiboas pardalis"
+d.raw$species[d.raw$species =="Boana pellucens"] <- "Hypsiboas pellucens"
+d.raw$species[d.raw$species =="Boana pulchella"] <- "Hypsiboas pulchellus"
+d.raw$species[d.raw$species =="Boana punctata"] <- "Hypsiboas punctatus"
+d.raw$species[d.raw$species =="Boana raniceps"] <- "Hypsiboas raniceps"
+d.raw$species[d.raw$species =="Boana rosenbergi"] <- "Hypsiboas rosenbergi"
+d.raw$species[d.raw$species =="Boana rufitela"] <- "Hypsiboas rutifelus"
+d.raw$species[d.raw$species =="Boana semilineata"] <- "Hypsiboas semilineatus"
+d.raw$species[d.raw$species =="Chalcorana labialis"] <- "Hylarana labialis"
+d.raw$species[d.raw$species =="Chiasmocleis bassleri"] <- "Syncope bassleri"
+d.raw$species[d.raw$species =="Hyalinobatrachium fleischmann"] <- "Hyalinobatrachium fleischmanni"
+d.raw$species[d.raw$species =="Hyla crucifer"] <- "Pseudacris crucifer"
+d.raw$species[d.raw$species =="Hyloxalus jacobuspetersi"] <- "Colostethus jacobuspetersi"
+d.raw$species[d.raw$species =="Hynobius fucus"] <- "Hynobius fuca"
+d.raw$species[d.raw$species =="Lithobates sphenocephalus"] <- "Rana sphenocephala"
+d.raw$species[d.raw$species =="Neobatrachus sudellae"] <- "Neobatrachus sudelli"
+d.raw$species[d.raw$species =="Nidirana adenopleura"] <- "Babina adenopleura"
+d.raw$species[d.raw$species =="Phrynoglossus laevis"] <- "Occidozyga laevis"
+d.raw$species[d.raw$species =="Physalaemus nattereri"] <- "Eupemphix nattereri"
+d.raw$species[d.raw$species =="Pseudis platentis"] <- "Pseudis platensis"
+d.raw$species[d.raw$species =="Rana perezi"] <- "Pelophylax perezi"
+d.raw$species[d.raw$species =="Scinax elaeochrous"] <- "Scinax elaeochroa"
+```
+
+Note that each figure underwent cosmetic changes in Microsoft PowerPoint. 
+
+# **Figure 2**
+
+## *Figure 2A* 
+
+Adult phylogenetic tree 
+
+```{r}
+d.adult<-filter(d.raw, life_stage_tested=="adults") # Only keep data for adults
+d.tree.adult<-select(d.adult, order, family, species, acclimation_temp, mean_UTL) # Only select relevant variables
+d.tree.adult$species <- gsub(" ", "_", d.tree.adult$species) # Add underscore between species names
+
+
+d.tree.adult<-d.tree.adult[d.tree.adult$species %in% tree$tip.label, ] # Remove all species not matching the tree
+
+pruned_tree.adult<-drop.tip(tree, tree$tip.label[-match(d.tree.adult$species, tree$tip.label)]) # Pruned tree that only contains species in the data 
+
+d.tree.adult<-mutate(d.tree.adult, tip.label= species) # create a column "tip.label" to match the data to the tree
+
+d.tree.onesp.adult<-group_by(d.tree.adult, tip.label) %>%  # Calculate the mean heat tolerance and number of effect sizes per species
+                    summarise(mean_UTL = mean(mean_UTL),
+                              n_es = n(),
+                              log_n_es=log2(n_es+1)) # Log + 1 for the plot
+
+d.tree.taxo.adult<-select(d.tree.adult, tip.label, order, family) # Only select relevant variables
+d.tree.taxo.adult<-distinct(d.tree.taxo.adult) # Remove duplicate species 
+d.tree.onesp.adult<-left_join(d.tree.onesp.adult, d.tree.taxo.adult, by="tip.label") # Join the data to the calculated stats for each species
+
+# Plot the tree
+p.adult<-ggtree(pruned_tree.adult, 
+                layout = "fan", # Circular phylogenetic tree
+                lwd = 0.75, 
+                aes(colour=order))+
+         scale_colour_manual(values=c("#60935D", "#DD9F18"))
+
+p.adult <- p.adult %<+% d.tree.onesp.adult # Match data to the tree
+
+p2.adult <- p.adult + geom_fruit(geom = geom_tile, # Heat map
+                                 mapping = aes(fill = mean_UTL), 
+                                 width=25, 
+                                 offset=0.06) + 
+                      scale_fill_viridis(option="plasma", # Colour gradient of the heat map
+                                         begin=0.001, 
+                                         end=0.95, 
+                                         name="Heat tolerance") 
+  
+p3.adult <- p2.adult + new_scale_fill() + geom_fruit(geom = geom_bar, # Bar plot
+                                                     mapping = aes(x = log_n_es,
+                                                                   fill = order),  
+                                                     stat = "identity", 
+                                                     orientation = "y", 
+                                                     axis.params = list(axis = "x", # Barplot parameters
+                                                                        text.angle = 0, 
+                                                                        hjust = 0, 
+                                                                        text.size = 2.5,
+                                                                        col="transparent"), 
+                                                     grid.params = list(alpha = 0.55),
+                                                     offset = 0.06, 
+                                                     pwidth = 0.25, 
+                                                     alpha = 1) + 
+                                           scale_fill_manual(values=c("#60935D", "#DD9F18"))+ # Barplot colours
+                                           theme(legend.position="bottom", 
+                                                 legend.direction ="horizontal")+
+                                           guides(colour=F) # Remove duplicated legend
+
+p3.adult 
+```
+
+## *Figure 2B*
+
+Juvenile phylogenetic tree. Note that, due to the small number of estimates for juveniles, they were grouped with data for larvae.
+```{r}
+## Tree with juveniles only 
+d.larvae<-filter(d.raw, life_stage_tested=="larvae"|life_stage_tested=="juveniles") # Keep only juveniles or larvae
+d.tree.larvae<-select(d.larvae, order, family, species, acclimation_temp, mean_UTL) # Only select relevant variables
+d.tree.larvae$species <- gsub(" ", "_", d.tree.larvae$species) # Add underscore between species names
+
+
+d.tree.larvae<-d.tree.larvae[d.tree.larvae$species %in% tree$tip.label, ] # Remove all species not matching the tree
+
+pruned_tree.larvae<-drop.tip(tree, tree$tip.label[-match(d.tree.larvae$species, tree$tip.label)]) # Pruned tree that only contains species in the data 
+
+d.tree.larvae<-mutate(d.tree.larvae, tip.label= species) # create a column "tip.label" to match the data to the tree
+d.tree.onesp.larvae<-group_by(d.tree.larvae, tip.label) %>%  
+                     summarise(mean_UTL = mean(mean_UTL),
+                               n_es = n(),
+                               log_n_es=log2(n_es+1)) # Log +1 for the plot
+
+d.tree.taxo.larvae<-select(d.tree.larvae, tip.label, order, family) # Keep relevant variables
+d.tree.taxo.larvae<-distinct(d.tree.taxo.larvae) # Remove duplicate species 
+d.tree.onesp.larvae<-left_join(d.tree.onesp.larvae, d.tree.taxo.larvae, by="tip.label") # Join the data to the calculated stats for each species
+
+summary(d.tree.onesp.adult$mean_UTL) # Summary to set the begin and end argument of the heat map
+summary(d.tree.onesp.larvae$mean_UTL) 
+
+
+# Plot the tree
+p.larvae<-ggtree(pruned_tree.larvae, 
+                 layout = "fan", # Plot a circular tree
+                 lwd = 0.75, 
+                 aes(colour=order))+
+          scale_colour_manual(values=c("#60935D", "#DD9F18"))
+
+p.larvae <- p.larvae %<+% d.tree.onesp.larvae # Match data to the tree
+p2.larvae <- p.larvae + geom_fruit(geom = geom_tile, 
+                                   mapping = aes(fill = mean_UTL), 
+                                   width=25, 
+                                   offset=0.06) + 
+                        scale_fill_viridis(option="plasma", 
+                                           begin=0.00130818, 
+                                           end=0.8139635) # Set beginining and end of the colour gradient to match the adult heat map
+  
+p3.larvae <- p2.larvae + new_scale_fill() + geom_fruit(geom = geom_bar, # Barplot
+                                                       mapping = aes(x = log_n_es, 
+                                                                     fill = order),  
+                                                       stat = "identity", 
+                                                       orientation = "y", 
+                                                       axis.params = list(axis = "x", # Barplot parameters
+                                                                          text.angle = 0, 
+                                                                          hjust = 0, 
+                                                                          text.size = 2.5,
+                                                                          col="transparent"), 
+                                                       grid.params = list(alpha = 0.55),
+                                                       offset = 0.06, 
+                                                       pwidth = 0.25, alpha = 1) + 
+                                             scale_fill_manual(values=c("#60935D", "#DD9F18"))+ # Barplot colours
+                                             theme(legend.position="none") # Remove legend
+p3.larvae 
+
+```
+
+```{r, fig.height=20, fig.width=12}
+p3.adult/p3.larvae # Combine adult and larvae plots
+
+#ggsave("output/Fig2_raw.svg", height=20, width=14, dpi=2000, bg="transparent")
+```
+
+## Trees with species names
+
+```{r, height=15, width=15}
+# Plot the adult tree
+p.adult<-ggtree(pruned_tree.adult, 
+                layout = "fan", 
+                lwd = 0.75, 
+                aes(colour=order))+
+         scale_colour_manual(values=c("#60935D", "#DD9F18"))
+
+p.adult <- p.adult %<+% d.tree.onesp.adult
+
+p.adult + geom_tiplab(size=2.5)
+
+
+# Plot the juvenile tree
+p.larvae<-ggtree(pruned_tree.larvae, 
+                 layout = "fan", 
+                 lwd = 0.75, 
+                 aes(colour=order))+
+          scale_colour_manual(values=c("#60935D", "#DD9F18"))
+
+p.larvae <- p.larvae %<+% d.tree.onesp.larvae
+
+p.larvae + geom_tiplab(size=2.5)
+
+```
+
+# **Figure 3**
+
+```{r}
+d.taxonomy<-read_csv("data/amph_shl_new_Classification.csv") # Load amphibian classification from Jetz and Pyron (2018)
+d.taxonomy$tip.label<-d.taxonomy$`Scientific Name` # Rename variable to match our dataset
+d.taxonomy$order<-d.taxonomy$Taxon # Rename variable to match our dataset
+d.taxonomy$tip.label <- gsub(" ", "_", d.taxonomy$tip.label) # Add underscore between species names
+
+d<-d.raw # Copy of raw data
+d.tree.all<-select(d, order, family, species, acclimation_temp, mean_UTL, life_stage_tested) # Only select relevant variables
+d.tree.all$species <- gsub(" ", "_", d.tree.all$species) # Add underscore between species names
+
+
+d.tree.all<-mutate(d.tree.all, tip.label= species) # create a column "tip.label" to match the data to the tree
+
+d.tree.onesp.all<-group_by(d.tree.all, tip.label) %>%  # Calculate the mean heat tolerance and number of effect sizes per species
+                    summarise(mean_UTL = mean(mean_UTL),
+                              n_es = n(),
+                              log_n_es=log2(n_es+1)) # Log + 1 for the plot
+
+d.tree.taxo.all<-select(d.tree.all, tip.label, order, family) # Only select relevant variables
+d.tree.taxo.all<-distinct(d.tree.taxo.all) # Remove duplicate species 
+d.tree.onesp.all<-left_join(d.tree.onesp.all, d.tree.taxo.all, by="tip.label") # Join the data to the calculated stats for each species
+
+species_in_tree<- data.frame(tip.label=tree$tip.label)# Get all species names from Jetz and Pyron (2018)
+d.tree.onesp.all<-full_join(d.tree.onesp.all, species_in_tree)
+d.tree.onesp.all<- full_join(d.tree.onesp.all, d.taxonomy, by="tip.label")
+d.tree.onesp.all <- mutate(d.tree.onesp.all, Order = coalesce(order.x, order.y)) # Combine content columns
+d.tree.onesp.all<-filter(d.tree.onesp.all, Order!="Outgroup") # Remove humans
+
+
+# Plot the tree
+p.all<-ggtree(tree, 
+                layout = "fan", # Circular phylogenetic tree
+                lwd = 0.2,
+                aes(colour=Order))+
+       scale_colour_manual(values=c("#60935D", "#DD9F18", "#925D83"),
+                           na.value="black")
+
+p.all <- p.all %<+% d.tree.onesp.all # Match data to the tree
+
+p2.all <- p.all + geom_fruit(geom = geom_tile, # Heat map
+                             mapping = aes(fill = mean_UTL), 
+                                           width=25, 
+                                           offset=0.06) + 
+                  scale_fill_viridis(option="plasma", # Match colour gradient of Fig. 2
+                                     begin=0.001, 
+                                     end=0.95, 
+                                     name="Heat tolerance",
+                                     na.value="gray95") +
+                  theme(legend.position="bottom", 
+                        legend.direction ="horizontal")
+
+p2.all
+
+#ggsave("output/Fig3_raw.svg", height=20, width=20, dpi=3000)
+
+```
+
+
+
+# **Figure 4** 
+
+```{r, fig.height=10, fig.width=18}
+
+WorldData <- map_data("world") # Get coordinates
+d.map<-d.raw # Copy dataset
+d.map$life_stage_tested[d.map$life_stage_tested=="juveniles"]<-"larvae" # Consider juveniles as "larvae"
+
+map <- ggplot(d.map, 
+              aes(x = longitude, # Set up plot
+                  y = latitude)) + 
+       geom_map(data = WorldData, 
+                map = WorldData, # Display world data
+                aes(x = long,
+                    y = lat, 
+                    group = group, 
+                    map_id = region), 
+                fill = "grey95", 
+                colour = "#7f7f7f", 
+                size = 0.5) + 
+       geom_point(data=d.map,  # Display location of species for which we have coordinates
+                  aes(fill=order, 
+                      col=life_stage_tested, 
+                      shape=language), 
+                  alpha = 0.6, 
+                  size=4, 
+                  stroke=1.5) +
+       scale_fill_manual(values=c("#60935D", "#DD9F18"), # Set the point inside colour according to orders
+                         name="Order", 
+                         guide=guide_legend(title.position="top", 
+                                            direction="horizontal")) + 
+       scale_colour_manual(values=c("black", "#4B0084"),  # Set the point outside colour according to life stages
+                           name="Life stage", 
+                           labels=c("Adults", "Juveniles"), 
+                           guide=guide_legend(title.position="top", 
+                                              direction="horizontal")) + 
+       scale_shape_manual(values=c(21,22,23,24,25),  # Set the shape of the points according to languages
+                          name="Language", 
+                          guide=guide_legend(title.position="top", 
+                                             direction="horizontal")) + 
+       theme_minimal() +  # Simple theme
+       theme(text=element_text(size=25),  # Increase font sizes 
+             axis.text = element_text(size=20),
+             legend.title=element_text(size=20, 
+                                       face="italic"),
+             legend.text = element_text(size=17),
+             legend.position="bottom",
+             legend.spacing.x=unit(0.25, "cm"),
+             legend.margin=margin(r=25, l=25))+
+       scale_x_continuous(breaks=seq(-180, 180, by = 30))+ # Set the limits of the plot
+       scale_y_continuous(breaks=seq(-90, 90, by = 30))+
+       labs(x = "Longitude", 
+            y = "Latitude") +
+       annotation_north_arrow(style = north_arrow_nautical(text_size=15, # Add nautical arrow
+                                                           fill=c("grey20", "white")), 
+                              height=unit(4, "cm"), 
+                              width=unit(4, "cm"))
+map
+
+#ggsave("output/Fig4_raw.svg", height=12, width=20, dpi=2000, bg="transparent")
+```
+
+

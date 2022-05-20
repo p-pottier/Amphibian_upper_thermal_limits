@@ -1,0 +1,287 @@
+---
+title: "Data_curation"
+author: "Anonymous for peer-review"
+date: "latest update: `r format(Sys.time(), '%d %B %Y')`"
+output: rmdformats::readthedown
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include = FALSE}
+# knitr setting
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE, 
+  tidy = TRUE,
+  cache = TRUE
+)
+```
+
+
+# **Load packages and data**
+
+## *Load packages* 
+
+```{r}
+pacman::p_load(tidyverse,
+               maps,
+               ape,
+               patchwork,
+               ggtree, # devtools::install_github("YuLab-SMU/ggtree")
+               ggtreeExtra, # devtools::install_github("xiangpin/ggtreeExtra")
+               ggnewscale, # this package is necessary for building trees
+               here,
+               ggspatial) 
+
+```
+
+## *Load data and phylogenetic tree*
+
+This tree is the consensus tree from Pyron and Jetz (2018)
+
+```{r}
+d.raw<-read_csv("data/Raw_data.csv")
+
+tree<-read.tree("data/amph_shl_new_Consensus_7238.tre") # Load tree
+```
+
+
+# **Harmonise taxonomy**
+
+`15 species` are not included in the tree of Pyron and Jetz (2018): 
+- *Amazophrynella javierbustamantei*
+- *Aquiloeurycea cafetalera*
+- *Chiasmocleis royi*
+- *Craugastor metriosistus*         
+- *Dendropsophus kamagarini*
+- *Gastrotheca lojana*
+- *Microkayla quimsacruzis*
+- *Pristimantis macrummendozai*
+- *Pseudacris hypochondriaca* 
+- *Rhinella horribilis*
+- *Scinax tsachila*
+- *Trachycephalus typhonius*
+- *Zhangixalus moltrechti*
+- *Zhangixalus prasinatus*
+- *Zhangixalus taipeianus*
+Those species were not removed from the curated data.
+
+`9 species` were not described at the species level: 
+- *Ameerega sp.*
+- *Aplastodiscus sp.*
+- *Boana sp.*
+- *Crossodactylus sp.*
+- *Engystomops sp.*
+- *Noblella sp.*
+- *Pristimantis sp.* 
+- *Psychrophrynella sp.1*
+- *Psychrophrynella_sp.2*
+Those species were removed from the curated data. 
+
+and `35` species names were up to date with amphibiaweb.org, but did not match the phylogeny of Jetz and Pyron (2018). 
+Taxonomic names were found, and we replaced species names to match the phylogeny of Jetz and Pyron (see below)
+
+
+```{r}
+
+d.treecheck<-select(d.raw, order, family, species) # Only select relevant variables
+d.treecheck$species <- gsub(" ", "_", d.treecheck$species) # Add underscore between species names
+
+'%!in%' <- function(x,y)!('%in%'(x,y)) # Function opposite of %in%
+
+d.not_in_tree<-d.treecheck[d.treecheck$species %!in% tree$tip.label, ] # Find species not matching the tree
+
+species_tree<-as.data.frame(tree$tip.label) # To check species in the tree
+species<-as.data.frame(d.raw$species) # To check species in the raw data
+
+# Replace species names not matching the tree
+d.raw$species[d.raw$species =="Agalychnis dacnicolor"] <- "Pachymedusa dacnicolor"
+d.raw$species[d.raw$species =="Anaxyrus caronus"] <- "Anaxyrus canorus"
+d.raw$species[d.raw$species =="Boana albomargina"] <- "Hypsiboas albomarginatus"
+d.raw$species[d.raw$species =="Boana albopunctata"] <- "Hypsiboas albopunctatus"
+d.raw$species[d.raw$species =="Boana almendarizae"] <- "Hypsiboas almendarizae"
+d.raw$species[d.raw$species =="Boana boans"] <- "Hypsiboas boans"
+d.raw$species[d.raw$species =="Boana cinerascens"] <- "Hypsiboas cinerascens"
+d.raw$species[d.raw$species =="Boana crepitans"] <- "Hypsiboas crepitans"
+d.raw$species[d.raw$species =="Boana curupi"] <- "Hypsiboas curupi"
+d.raw$species[d.raw$species =="Boana faber"] <- "Hypsiboas faber"
+d.raw$species[d.raw$species =="Boana fasciata"] <- "Hypsiboas fasciatus"
+d.raw$species[d.raw$species =="Boana geographica"] <- "Hypsiboas geographicus"
+d.raw$species[d.raw$species =="Boana lanciformis"] <- "Hypsiboas lanciformis"
+d.raw$species[d.raw$species =="Boana pardalis"] <- "Hypsiboas pardalis"
+d.raw$species[d.raw$species =="Boana pellucens"] <- "Hypsiboas pellucens"
+d.raw$species[d.raw$species =="Boana pulchella"] <- "Hypsiboas pulchellus"
+d.raw$species[d.raw$species =="Boana punctata"] <- "Hypsiboas punctatus"
+d.raw$species[d.raw$species =="Boana raniceps"] <- "Hypsiboas raniceps"
+d.raw$species[d.raw$species =="Boana rosenbergi"] <- "Hypsiboas rosenbergi"
+d.raw$species[d.raw$species =="Boana rufitela"] <- "Hypsiboas rutifelus"
+d.raw$species[d.raw$species =="Boana semilineata"] <- "Hypsiboas semilineatus"
+d.raw$species[d.raw$species =="Chalcorana labialis"] <- "Hylarana labialis"
+d.raw$species[d.raw$species =="Chiasmocleis bassleri"] <- "Syncope bassleri"
+d.raw$species[d.raw$species =="Hyalinobatrachium fleischmann"] <- "Hyalinobatrachium fleischmanni"
+d.raw$species[d.raw$species =="Hyla crucifer"] <- "Pseudacris crucifer"
+d.raw$species[d.raw$species =="Hyloxalus jacobuspetersi"] <- "Colostethus jacobuspetersi"
+d.raw$species[d.raw$species =="Hynobius fucus"] <- "Hynobius fuca"
+d.raw$species[d.raw$species =="Lithobates sphenocephalus"] <- "Rana sphenocephala"
+d.raw$species[d.raw$species =="Neobatrachus sudellae"] <- "Neobatrachus sudelli"
+d.raw$species[d.raw$species =="Nidirana adenopleura"] <- "Babina adenopleura"
+d.raw$species[d.raw$species =="Phrynoglossus laevis"] <- "Occidozyga laevis"
+d.raw$species[d.raw$species =="Physalaemus nattereri"] <- "Eupemphix nattereri"
+d.raw$species[d.raw$species =="Pseudis platentis"] <- "Pseudis platensis"
+d.raw$species[d.raw$species =="Rana perezi"] <- "Pelophylax perezi"
+d.raw$species[d.raw$species =="Scinax elaeochrous"] <- "Scinax elaeochroa"
+
+```
+
+# **Descriptive statistics for the raw data**
+
+```{r}
+n_distinct(d.raw$es_ID) # 3095 effect sizes
+n_distinct(d.raw$ref) # 214 studies
+n_distinct(d.raw$species) # 616 species
+n_distinct(d.raw$population_ID) # 1166 populations 
+n_distinct(d.raw$cohort_ID) # 2883 cohorts
+n_distinct(d.raw$family) # 37 families
+
+d.raw %>% group_by(ref) %>% 
+          summarise(n_sp = n_distinct(species),
+                    n_pop = n_distinct(population_ID),
+                    n_es = n_distinct(es_ID)) %>% 
+          ungroup() %>% 
+          summarise(`Number of species per study` = mean(n_sp),
+                    `SD species per study` = sd(n_sp),
+                    `Minimum number of species per study` = min(n_sp),
+                    `Maximum number of species per study` = max(n_sp),
+                    
+                    `Number of populations per study` = mean(n_pop),
+                    `SD populations per study` = sd(n_pop),
+                    `Minimum number of populations per study` = min(n_pop),
+                    `Maximum number of populations per study` = max(n_pop),
+                    
+                    `Number of estimates per study` = mean(n_es),
+                    `SD estimates per study` = sd(n_es),
+                    `Minimum number of estimates per study` = min(n_es),
+                    `Maximum number of estimates per study` = max(n_es))
+# 4.95 (+/- 10.2) species per study on average (range: 1-75)
+# 5.91 (+/- 10.7) populations per study on average (range: 1-75)
+# 14.46 estimates (+/- 27.2) estimates per study on average (range: 1-230)
+
+d.raw %>% group_by(species) %>% 
+          summarise(n_pop = n_distinct(population_ID),
+                    n_es = n_distinct(es_ID)) %>% 
+          ungroup() %>% 
+          summarise(`Number of populations per species` = mean(n_pop),
+                    `SD populations per species` = sd(n_pop),
+                    `Minimum number of populations per species` = min(n_pop),
+                    `Maximum number of populations per species` = max(n_pop),
+                    
+                    `Number of estimates per species` = mean(n_es),
+                    `SD estimates per species` = sd(n_es),
+                    `Minimum number of estimates per species` = min(n_es),
+                    `Maximum number of estimates per species` = max(n_es))
+# 1.93 (+/- 2.35) populations per species on average (range: 1-26)
+# 5.02 (+/- 12.6) estimates per species on average (range : 1-163)
+
+
+d.raw %>% group_by(name) %>% 
+          summarise(n_st = n_distinct(ref),
+                    n_es = n_distinct(es_ID)) %>% 
+          mutate(percent_st = (n_st/214)*100,
+                 percent_es = (n_es/3095)*100) # Percentage of studies and effect sizes extracted by each author
+
+n_distinct(d.raw$es_ID[is.na(d.raw$error_UTL)==TRUE]) # Number of estimates missing measures of dispersion
+```
+
+# **Data curation**
+
+## *Remove species not described at the species level*
+```{r}
+d.curated <- filter(d.raw, !str_detect(d.raw$species, "\\.")) 
+```
+
+## *Remove extinct species*
+
+Remove one extinct species: *Taudactylus diurnus* (2 estimates)
+```{r}
+d.curated <- filter(d.curated, IUCN_status!="EX") 
+```
+
+## *Remove animals exposed to hormones or chemicals* 
+
+```{r}
+d.curated <- filter(d.curated, is.na(concentration_chemical_hormone)==TRUE|concentration_chemical_hormone==0)
+```
+
+## *Remove data with procedural concerns* 
+
+```{r}
+d.curated <- filter(d.curated, is.na(flag)==TRUE)
+```
+
+## *Export data*
+
+```{r}
+write_csv(d.curated, file=here("data/Curated_data.csv"))
+```
+
+
+# **Descriptive statistics for the curated data**
+
+```{r}
+
+n_distinct(d.curated$es_ID) # 2890 effect sizes
+n_distinct(d.curated$ref) # 199 studies
+n_distinct(d.curated$species) # 588 species
+n_distinct(d.curated$population_ID) # 1111 populations 
+n_distinct(d.curated$cohort_ID) # 2682 cohorts
+n_distinct(d.curated$family)
+
+test<-d.curated %>% group_by(ref) %>% 
+          summarise(n_sp = n_distinct(species),
+                    n_pop = n_distinct(population_ID),
+                    n_es = n_distinct(es_ID)) %>% 
+          ungroup() %>% 
+          summarise(`Number of species per study` = mean(n_sp),
+                    `SD species per study` = sd(n_sp),
+                    `Minimum number of species per study` = min(n_sp),
+                    `Maximum number of species per study` = max(n_sp),
+                    
+                    `Number of populations per study` = mean(n_pop),
+                    `SD populations per study` = sd(n_pop),
+                    `Minimum number of populations per study` = min(n_pop),
+                    `Maximum number of populations per study` = max(n_pop),
+                    
+                    `Number of estimates per study` = mean(n_es),
+                    `SD estimates per study` = sd(n_es),
+                    `Minimum number of estimates per study` = min(n_es),
+                    `Maximum number of estimates per study` = max(n_es))
+# 5.06 (+/- 10.3) species per study on average (range: 1-74)
+# 6.07 (+/- 10.8) populations per study on average (range: 1-74)
+# 14.52 estimates (+/- 27.9) estimates per study on average (range: 1-230)
+
+d.curated %>% group_by(species) %>% 
+          summarise(n_pop = n_distinct(population_ID),
+                    n_es = n_distinct(es_ID),
+                    n_acc = n_distinct(acclimation_temp)) %>% 
+          ungroup() %>% 
+          summarise(`Number of populations per species` = mean(n_pop),
+                    `SD populations per species` = sd(n_pop),
+                    `Minimum number of populations per species` = min(n_pop),
+                    `Maximum number of populations per species` = max(n_pop),
+                    
+                    `Number of estimates per species` = mean(n_es),
+                    `SD estimates per species` = sd(n_es),
+                    `Minimum number of estimates per species` = min(n_es),
+                    `Maximum number of estimates per species` = max(n_es))
+# 1.93 (+/- 2.36) populations per species on average (range: 1-26)
+# 4.91 (+/- 12.1) estimates per species on average (range : 1-146)
+
+n_distinct(d.curated$es_ID[is.na(d.curated$error_UTL)==TRUE]) # Number of estimates missing measures of dispersion
+```
+
+# **Package versions**
+```{r}
+sessionInfo()
+```
+
