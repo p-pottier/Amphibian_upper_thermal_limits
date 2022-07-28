@@ -1,6 +1,6 @@
 # A comprehensive database of amphibian heat tolerance
 
-Cite this work as **Patrice Pottier, Hsien-Yung Lin2, Rachel R. Y. Oh, Pietro Pollo, A. Nayelli Rivera-Villanueva, José O. Valdebenito, Yefeng Yang, Tatsuya Amano, Samantha Burke, Szymon M. Drobniak, and Shinichi Nakagawa. (2022) A comprehensive database of amphibian heat tolerance** [![DOI](https://zenodo.org/badge/494322085.svg)](https://zenodo.org/badge/latestdoi/494322085)
+Cite this dataset as **Patrice Pottier, Hsien-Yung Lin, Rachel R. Y. Oh, Pietro Pollo, A. Nayelli Rivera-Villanueva, José O. Valdebenito, Yefeng Yang, Tatsuya Amano, Samantha Burke, Szymon M. Drobniak, and Shinichi Nakagawa. (2022) A comprehensive database of amphibian heat tolerance** [![DOI](https://zenodo.org/badge/494322085.svg)](https://zenodo.org/badge/latestdoi/494322085)
 
 
 This repository contains data records for a Data descriptor submitted to *Scientific Data*. 
