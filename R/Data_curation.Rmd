@@ -4,7 +4,7 @@ author: "Anonymous for peer-review"
 date: "latest update: `r format(Sys.time(), '%d %B %Y')`"
 output: rmdformats::readthedown
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 
@@ -134,11 +134,27 @@ d.raw$species[d.raw$species =="Scinax elaeochrous"] <- "Scinax elaeochroa"
 
 ```
 
+# **Correct mistakes** 
+
+Family names were incorrect for some species.
+```{r}
+d.raw %>%
+     group_by(species) %>%
+     summarise(family  = unique(family)) %>%
+     filter(n()>1)
+
+d.raw$family[d.raw$species =="Eleutherodactylus coqui"] <- "Eleutherodactylidae"
+d.raw$family[d.raw$species =="Mixophyes fasciolatus"] <- "Myobatrachidae"
+d.raw$family[d.raw$species =="Pelodytes ibericus"] <- "Pelodytidae"
+d.raw$family[d.raw$species =="Pelodytes punctatus"] <- "Pelodytidae"
+d.raw$family[d.raw$species =="Pelophylax perezi"] <- "Ranidae"
+```
+
 # **Descriptive statistics for the raw data**
 
 ```{r}
 n_distinct(d.raw$es_ID) # 3095 effect sizes
-n_distinct(d.raw$ref) # 214 studies
+n_distinct(d.raw$ref) # 213 studies
 n_distinct(d.raw$species) # 616 species
 n_distinct(d.raw$population_ID) # 1166 populations 
 n_distinct(d.raw$cohort_ID) # 2883 cohorts
@@ -163,9 +179,9 @@ d.raw %>% group_by(ref) %>%
                     `SD estimates per study` = sd(n_es),
                     `Minimum number of estimates per study` = min(n_es),
                     `Maximum number of estimates per study` = max(n_es))
-# 4.95 (+/- 10.2) species per study on average (range: 1-75)
-# 5.91 (+/- 10.7) populations per study on average (range: 1-75)
-# 14.46 estimates (+/- 27.2) estimates per study on average (range: 1-230)
+# 4.97 (+/- 10.2) species per study on average (range: 1-75)
+# 5.93 (+/- 10.7) populations per study on average (range: 1-75)
+# 14.53 estimates (+/- 27.3) estimates per study on average (range: 1-230)
 
 d.raw %>% group_by(species) %>% 
           summarise(n_pop = n_distinct(population_ID),
@@ -182,6 +198,13 @@ d.raw %>% group_by(species) %>%
                     `Maximum number of estimates per species` = max(n_es))
 # 1.93 (+/- 2.35) populations per species on average (range: 1-26)
 # 5.02 (+/- 12.6) estimates per species on average (range : 1-163)
+
+d.raw %>% group_by(language) %>% 
+          summarise(n_st = n_distinct(ref),
+                    n_sp = n_distinct(species_ID),
+                    n_pop = n_distinct(population_ID),
+                    n_es = n_distinct(es_ID)) 
+# Number of studies, species, populations and estimates for by publication language
 
 
 d.raw %>% group_by(name) %>% 
@@ -230,14 +253,14 @@ write_csv(d.curated, file=here("data/Curated_data.csv"))
 
 ```{r}
 
-n_distinct(d.curated$es_ID) # 2890 effect sizes
-n_distinct(d.curated$ref) # 199 studies
-n_distinct(d.curated$species) # 588 species
-n_distinct(d.curated$population_ID) # 1111 populations 
-n_distinct(d.curated$cohort_ID) # 2682 cohorts
-n_distinct(d.curated$family)
+n_distinct(d.curated$es_ID) # 2888 effect sizes
+n_distinct(d.curated$ref) # 197 studies
+n_distinct(d.curated$species) # 587 species
+n_distinct(d.curated$population_ID) # 1109 populations 
+n_distinct(d.curated$cohort_ID) # 2680 cohorts
+n_distinct(d.curated$family) # 36 families
 
-test<-d.curated %>% group_by(ref) %>% 
+d.curated %>% group_by(ref) %>% 
           summarise(n_sp = n_distinct(species),
                     n_pop = n_distinct(population_ID),
                     n_es = n_distinct(es_ID)) %>% 
@@ -256,9 +279,9 @@ test<-d.curated %>% group_by(ref) %>%
                     `SD estimates per study` = sd(n_es),
                     `Minimum number of estimates per study` = min(n_es),
                     `Maximum number of estimates per study` = max(n_es))
-# 5.06 (+/- 10.3) species per study on average (range: 1-74)
-# 6.07 (+/- 10.8) populations per study on average (range: 1-74)
-# 14.52 estimates (+/- 27.9) estimates per study on average (range: 1-230)
+# 5.09 (+/- 10.3) species per study on average (range: 1-74)
+# 6.12 (+/- 10.9) populations per study on average (range: 1-74)
+# 14.66 estimates (+/- 28.0) estimates per study on average (range: 1-230)
 
 d.curated %>% group_by(species) %>% 
           summarise(n_pop = n_distinct(population_ID),
@@ -274,8 +297,15 @@ d.curated %>% group_by(species) %>%
                     `SD estimates per species` = sd(n_es),
                     `Minimum number of estimates per species` = min(n_es),
                     `Maximum number of estimates per species` = max(n_es))
-# 1.93 (+/- 2.36) populations per species on average (range: 1-26)
-# 4.91 (+/- 12.1) estimates per species on average (range : 1-146)
+# 1.93 (+/- 2.37) populations per species on average (range: 1-26)
+# 4.92 (+/- 12.08) estimates per species on average (range : 1-146)
+
+d.curated %>% group_by(language) %>% 
+          summarise(n_st = n_distinct(study_ID),
+                    n_sp = n_distinct(species_ID),
+                    n_pop = n_distinct(population_ID),
+                    n_es = n_distinct(es_ID)) 
+# Number of studies, species, populations and estimates for by publication language
 
 n_distinct(d.curated$es_ID[is.na(d.curated$error_UTL)==TRUE]) # Number of estimates missing measures of dispersion
 ```
